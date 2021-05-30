@@ -196,6 +196,18 @@ void display_vaccine()/*显示全部疫苗信息*/
     int vaccine_num=0;
     system("cls");
     fflush(stdin);
+
+    char ch;
+    FILE *fp=fopen("vaccine.txt","r");
+    ch = fgetc(fp);
+    if(ch==EOF) {
+        printf("\n没有任何疫苗信息!\n\n");
+        printf("\n\n按任意键返回上一级菜单!\n");
+   	    getch();
+        return;
+    }
+    fclose(fp);
+
     p1=fopen("vaccine.txt","r");
     while(!feof(p1))
     {
@@ -208,26 +220,21 @@ void display_vaccine()/*显示全部疫苗信息*/
     }
     fclose(p1);
     printf("当前系统内有%d条疫苗记录\n\n",vaccine_num);
-    if(vaccine_num==0)
+
+    n=0;
+    printf("|---------------------------------疫苗信息----------------------------------|\n");
+    printf("|编号  疫苗名      公司      允许接种年龄     需要接种的次数   是否使用了   |\n");
+    printf("|                                                                           |\n");
+    while(n<vaccine_num)
     {
-      	printf("\n没有任何疫苗信息!\n\n");
+        printf("|%-6d%-12s%-10s%-8d~%-16d%-14d%-8d|\n",
+                newvaccine[n].vaccine_id, 
+                newvaccine[n].vaccine_name, newvaccine[n].company,
+                newvaccine[n].allowed_age[0], newvaccine[n].allowed_age[1],
+                newvaccine[n].times, newvaccine[n].is_used);
+        n++;
     }
-    else
-    {
-      	n=0;
-      	printf("|---------------------------------疫苗信息----------------------------------|\n");
-      	printf("|编号  疫苗名      公司      允许接种年龄     需要接种的次数   是否使用了   |\n");
-      	printf("|                                                                           |\n");
-      	while(n<vaccine_num)
-        {
-        	printf("|%-6d%-12s%-10s%-8d~%-16d%-14d%-8d|\n",
-                    newvaccine[n].vaccine_id, 
-                    newvaccine[n].vaccine_name, newvaccine[n].company,
-                    newvaccine[n].allowed_age[0], newvaccine[n].allowed_age[1],
-                    newvaccine[n].times, newvaccine[n].is_used);
-        	n++;
-        }
-      }
+    
     printf("\n\n按任意键返回上一级菜单!\n");
    	getch();
 }
