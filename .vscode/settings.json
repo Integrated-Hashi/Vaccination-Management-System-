@@ -1,4 +1,8 @@
 {
     "fileheader.LastModifiedBy": "cqupt_chenjunyu",
-    "fileheader.Author": "cqupt_chenjunyu"
+    "fileheader.Author": "cqupt_chenjunyu",
+    "files.associations": {
+        "typeinfo": "c"
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
 }
