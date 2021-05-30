@@ -12,7 +12,7 @@
 #include <conio.h>
 
 //疫苗表
-typedef struct vaccine{
+typedef struct Vaccine{
     int vaccine_id;//疫苗编号
     char vaccine_name[10];//疫苗名字
     char company[50];//疫苗生产公司
@@ -22,7 +22,7 @@ typedef struct vaccine{
 }VACCINE;
 
 //受试者表
-typedef struct person{
+typedef struct Person{
     int user_id;//编号
     char person_name[10];//名字
     char ID_card[20];//身份证 
@@ -32,7 +32,7 @@ typedef struct person{
 }PERSON;
 
 //接种信息表
-typedef struct thing{
+typedef struct Thing{
     int id;//事件编号
     int user_id;//用户编号
     char vaccine_id; //疫苗编号
@@ -238,3 +238,95 @@ void display_vaccine()/*显示全部疫苗信息*/
     printf("\n\n按任意键返回上一级菜单!\n");
    	getch();
 }
+
+void vaccinate(){
+    FILE *p1, *p2, *p3; 
+    system("cls");
+    fflush(stdin);
+    char search[20];
+    int flag1 = 0;
+
+    printf("请输入您的身份证号: ");
+    gets(search);
+
+    PERSON tmpP;
+    p1=fopen("person.txt","r");
+    while(!feof(p1))
+    {
+      	fscanf(p1,"%d %s %s %d %d %s\n",
+                        &tmpP.user_id, 
+                        tmpP.person_name, tmpP.ID_card,
+                        &tmpP.sex, &tmpP.age,
+                        tmpP.phone);  
+      	if((strcmp(search, tmpP.ID_card))==0){
+            flag1 = 1;
+            break;   
+          }
+          
+    }
+    fclose(p1);
+
+    if(flag1 == 1){
+        fflush(stdin);
+        char search_vaccine[10];
+        int n;
+        printf("您的个人信息已存在\n");
+        printf("请输入您先前的接种疫苗名称: ");
+        gets(search_vaccine);
+
+        VACCINE newvaccine;
+        int flag2 = 0;
+        FILE *fp=fopen("vaccine.txt","r");
+        while(!feof(fp))
+        {
+            fscanf(fp,"%d %s %s %d %d %d %d\n",
+                        &newvaccine.vaccine_id, 
+                        newvaccine.vaccine_name, newvaccine.company,
+                        &newvaccine.allowed_age[0], &newvaccine.allowed_age[1],
+                        &newvaccine.times, &newvaccine.is_used);   
+            if((strcmp(newvaccine.vaccine_name, search_vaccine))==0&&newvaccine.is_used==0){
+                flag2 = 1;
+                break;
+            }
+        }
+        fclose(fp);
+
+        if(flag2 == 0){
+            printf("无疫苗可接种了抑或是您输入的疫苗名称有误!\n");
+            printf("\n\n按任意键返回上一级菜单!\n");
+            getch();
+            return;
+        }
+
+        printf("请输入您先前的接种次数: ");
+        sacnf("%d", &n);
+
+        if(n>=newvaccine.times){
+            printf("您先前的接种已足够次数，不需要再接种了\n");
+            printf("\n\n按任意键返回上一级菜单!\n");
+            getch();
+            return;
+        }
+
+        VACCINE vaccine[1000];
+        int vaccine_num = 0;
+        p1=fopen("vaccine.txt","r");
+        while(!feof(p1))
+        {
+            fscanf(p1,"%d %s %s %d %d %d %d\n",
+                            &vaccine[vaccine_num].vaccine_id, 
+                            vaccine[vaccine_num].vaccine_name, vaccine[vaccine_num].company,
+                            &vaccine[vaccine_num].allowed_age[0], &vaccine[vaccine_num].allowed_age[1],
+                            &vaccine[vaccine_num].times, &vaccine[vaccine_num].is_used);  
+            vaccine_num++;
+        }
+        fclose(p1);
+    }
+}
+
+int user_id;//编号
+    char person_name[10];//名字
+    char ID_card[20];//身份证 
+    int sex;//性别
+    int age;//年龄
+    char phone[20];//电话
