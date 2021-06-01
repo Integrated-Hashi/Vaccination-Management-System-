@@ -34,7 +34,7 @@ typedef struct Thing{
     int time;//接种的次数（第几次）
 }THING;
 
-void menu1();
+void menu();
 void add_vaccine();
 int check_vaccine_num();
 void display_vaccine();
@@ -42,9 +42,10 @@ void display_vaccine();
 void add_vaccinate();
 int check_thing_num();
 void renew_vaccine(int vaccine_id);
+void display_thing();
 
 int main(){
-    int flag1=1,flag2=1,flag3=1;/* flag是判断条件,flag为 1 时为真，为 0 时为假 */
+    int flag1=1,flag2=1,flag3=1;
 	char choice1,choice2,choice3;
 	FILE *p1,*p2,*p3;
 	
@@ -67,14 +68,40 @@ int main(){
 		fclose(p3);
 	}
 
-    add_vaccine();
-    add_vaccinate();
+    while(flag1==1)
+    {
+        system("cls");
+        menu();
+
+        printf("\n");
+  		printf("请您选择(1-5):");
+  		choice1=getch();
+  		while(choice1!='1'&&choice1!='2'&&choice1!='3'&&choice1!='4'&&choice1!='5')
+  			choice1=getch();
+  		printf("%c",choice1);
+  		fflush(stdin);
+
+        switch(choice1)
+				{
+					case '1':add_vaccine(); break;
+					case '2':add_vaccinate(); break;
+   					case '3':display_thing(); break;
+   					case '4':display_vaccine(); break;
+   					case '5':flag1=0; break;
+   					default:break;
+   					}
+    }
+    fflush(stdin);
+	system("cls");
+	printf("\n\n你已经安全退出系统!(按任意键关闭界面)\n\n");
+	getch();
+	return 0;
 
 }
 
-void menu1()
+void menu()
 {
-	system("color E9");
+	system("color F9");
 	printf("\n\n");
 	printf("\t\t\t *=======================================*\n");
 	printf("\t\t\t|  * - Vaccination-Management-System - *  |\n");
@@ -83,7 +110,7 @@ void menu1()
 	printf("\t\t\t| *                                     * |\n");
 	printf("\t\t\t| |  [2]   疫苗接种                     | |\n");
 	printf("\t\t\t| *                                     * |\n");
-	printf("\t\t\t| |  [3]   查看接种人信息               | |\n");
+	printf("\t\t\t| |  [3]   查看接种信息                 | |\n");
 	printf("\t\t\t| *                                     * |\n");
 	printf("\t\t\t| |  [4]   查看疫苗信息                 | |\n");
 	printf("\t\t\t| *                                     * |\n");
@@ -241,6 +268,60 @@ void display_vaccine()/*显示全部疫苗信息*/
    	getch();
 }
 
+void display_thing()/*显示全部接种信息*/
+{
+    FILE *p1;
+    int n;
+    THING thing[1000];
+    int thing_num=0;
+    system("cls");
+    fflush(stdin);
+
+    char ch;
+    FILE *fp=fopen("thing.txt","r");
+    ch = fgetc(fp);
+    if(ch==EOF) 
+    {
+        printf("\n没有任何接种信息!\n\n");
+        printf("\n\n按任意键返回上一级菜单!\n");
+   	    getch();
+        return;
+    }
+    fclose(fp);
+
+    p1=fopen("thing.txt","r");
+    while(!feof(p1))
+    {
+      	fscanf(p1,"%d %s %s %d %d %s %d %s %d\n",
+                        &thing[thing_num].thing_id, 
+                        thing[thing_num].person_name, thing[thing_num].ID_card,
+                        &thing[thing_num].sex, &thing[thing_num].age, thing[thing_num].phone,
+                        &thing[thing_num].vaccine_id, thing[thing_num].vaccine_name,
+                        &thing[thing_num].time);  
+      	thing_num++;
+    }
+    fclose(p1);
+    printf("当前系统内有%d条疫苗记录\n\n",thing_num);
+
+    n=0;
+    printf("|--------------------------------------------接种信息------------------------------------------|\n");
+    printf("|编号  |姓名    |身份证号          |性别  |年龄  |电话号码    |疫苗编号  |疫苗名称    |第n次接种|\n");
+    printf("|                                                                                               |\n");
+    while(n<thing_num)
+    {
+        printf("|%-6d|%-8s|%-18s|%-6d|%-6d|%-12s|%-10d|%-12s|%-9d|\n",
+                        thing[n].thing_id, 
+                        thing[n].person_name, thing[n].ID_card,
+                        thing[n].sex, thing[n].age, thing[n].phone,
+                        thing[n].vaccine_id, thing[n].vaccine_name,
+                        thing[n].time);  
+        n++;
+    }
+    
+    printf("\n\n按任意键返回上一级菜单!\n");
+   	getch();
+}
+
 void add_vaccinate() /*输入添加的接种信息*/
 {
     char choice;
@@ -274,11 +355,10 @@ void add_vaccinate() /*输入添加的接种信息*/
                                 &thing.time);  
                 if((strcmp(thing.ID_card, newthing.ID_card))==0)
                 {
-                    printf("曾接种过，个人信息已存在。\n");
                     newthing = thing;
                     newthing.thing_id = thing_num;
                     flag1 = 1;
-                    break;
+                    //break;
                 }
             }
             fclose(p1);
@@ -287,6 +367,7 @@ void add_vaccinate() /*输入添加的接种信息*/
         if(flag1 == 1)
         {
             //查看接种疫苗的需要接种的次数
+            printf("曾接种过，个人信息已存在。\n");
             int allowed_num;
             VACCINE vaccine1;
             p1=fopen("vaccine.txt","r");
@@ -334,12 +415,27 @@ void add_vaccinate() /*输入添加的接种信息*/
 
             if(flag2==0){
                 printf("抱歉，目前没有合适的疫苗可供接种。\n");
+                printf("(可能年龄不合适抑或是疫苗库存不足)\n");
                 printf("\n\n按任意键返回上一级菜单!\n");
    	            getch();
                 return;
             }
 
             renew_vaccine(vaccineID);
+
+            fflush(stdin);
+            printf("\n\n请确认接种(y/n): ");
+            choice=getch();
+            while(choice!='Y'&&choice!='y'&&choice!='N'&&choice!='n')
+                choice=getch();
+            printf("%c",choice);
+            printf("\n");
+            if(choice=='N'||choice=='n')
+            {
+                printf("\n\n按任意键返回上一级菜单!\n");
+   	            getch();
+                return;
+            }
 
             p1=fopen("thing.txt","a");
             fprintf(p1,"%d %s %s %d %d %s %d %s %d\n",
@@ -350,7 +446,8 @@ void add_vaccinate() /*输入添加的接种信息*/
                                 newthing.time+1); 
             fclose(p1);
 
-            printf("接种成功！");
+            printf("\n接种事件信息已添加到thing.txt文件中!\n");
+            printf("接种成功！\n");
 
         }
         else 
@@ -371,6 +468,7 @@ void add_vaccinate() /*输入添加的接种信息*/
             printf("请输入电话: ");
             gets(newthing.phone); 
 
+            newthing.time=0;
             //找到可用的疫苗
             int vaccineID;
             int flag2 = 0;
@@ -385,6 +483,7 @@ void add_vaccinate() /*输入添加的接种信息*/
                                 &vaccine1.times, &vaccine1.is_used);  
                 if(newthing.age>=vaccine1.allowed_age[0]&&vaccine1.is_used==0&&newthing.age<=vaccine1.allowed_age[1]){
                     vaccineID = vaccine1.vaccine_id;
+                    strcpy(newthing.vaccine_name, vaccine1.vaccine_name);
                     flag2 = 1;
                     break;
                 }
@@ -400,6 +499,20 @@ void add_vaccinate() /*输入添加的接种信息*/
 
             renew_vaccine(vaccineID);
 
+            fflush(stdin);
+            printf("\n\n请确认接种(y/n): ");
+            choice=getch();
+            while(choice!='Y'&&choice!='y'&&choice!='N'&&choice!='n')
+                choice=getch();
+            printf("%c",choice);
+            printf("\n");
+            if(choice=='N'||choice=='n')
+            {
+                printf("\n\n按任意键返回上一级菜单!\n");
+   	            getch();
+                return;
+            }
+
             p1=fopen("thing.txt","a");
             fprintf(p1,"%d %s %s %d %d %s %d %s %d\n",
                                 newthing.thing_id, 
@@ -408,9 +521,11 @@ void add_vaccinate() /*输入添加的接种信息*/
                                 vaccineID, newthing.vaccine_name,
                                 newthing.time+1); 
             fclose(p1);
-
-            printf("接种成功！");
+            printf("\n接种事件信息已添加到thing.txt文件中!\n");
+            printf("接种成功！\n");
         }
+
+
         fflush(stdin);
       	printf("\n\n下一位接种？(y/n): ");
         choice=getch();
@@ -481,5 +596,5 @@ void renew_vaccine(int vaccine_id){
                         vaccine[n].allowed_age[0], vaccine[n].allowed_age[1],
                         vaccine[n].times, vaccine[n].is_used); 
     fclose(p1);
-    printf("\n修改成功!");
+    printf("\n疫苗使用信息已添加到vaccine.txt文件中!\n");
 }
